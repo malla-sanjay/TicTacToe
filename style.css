@@ -1,3 +1,16 @@
+/*useful variables for rescaling*/
+:root{
+    --cell-size: 140px;
+    --mark-size: calc((var(--cell-size)) * 0.9)
+}
+
+.header{
+    font-size: 4rem;
+    font-weight: 600;
+    margin-bottom: 5%;
+}
+
+
 body {
     display: flex;
     flex-direction: column;
@@ -6,16 +19,109 @@ body {
 
 .board {
     display: grid;
-    grid-template-columns: 140px 140px 140px;
-    row-gap: 5px;
-    column-gap: 5px;
+    grid-template-columns: repeat(3, auto);
+    gap: 5px;
+    background-color: black;
 }
 
-.block {
-    background-color: aqua;
-    height: 140px;
-    width: 140px;
-    line-height: 140px;
-    text-align: center;
-    font-size: 48px;
+
+.cell {
+    background-color: white;
+    height: var(--cell-size);
+    width: var(--cell-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.cell.x, .cell.o{
+    cursor: not-allowed;
+}
+
+/*Creating X using pseudo elements + x hover effect*/
+.cell.x::before, .cell.x::after,
+.board.x .cell:not(.x):not(.o):hover::before,
+.board.x .cell:not(.x):not(.o):hover::after{
+    content: '';
+    width: calc(var(--mark-size)*0.15);
+    height: var(--mark-size);
+    background-color: black;
+    position: absolute;
+}
+
+.cell.x::before,
+.board.x .cell:not(.x):not(.o):hover::before{
+    transform: rotate(45deg);
+}
+
+.cell.x::after,
+.board.x .cell:not(.x):not(.o):hover::after{
+    transform: rotate(-45deg);
+}
+
+.board.x .cell:not(.x):not(.o):hover::before,
+.board.x .cell:not(.x):not(.o):hover::after{
+    background-color: lightgray;
+}
+
+/*Creating O using pseudo elements + O hover effect*/
+.cell.o::before,
+.board.o .cell:not(.x):not(.o):hover::before{
+    content: '';
+    width: var(--mark-size);
+    height: var(--mark-size);
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.cell.o::after,
+.board.o .cell:not(.x):not(.o):hover::after{
+    content: '';
+    width: calc(var(--mark-size) * 0.7);
+    height: calc(var(--mark-size) * 0.7);
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.board.o .cell:not(.x):not(.o):hover::before{
+    background-color: lightgray;
+}
+
+/*Winner message section*/
+.winner{
+    display:none;
+}
+
+.winner.show{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color:white;
+    background-color: rgba(0, 0, 0, 0.9);
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.winning-message{
+    font-size: 5rem;
+}
+
+.reset-button{
+    font-size: 4rem;
+    border: 3px solid black;
+    border-radius: 10px;
+    transition: 0.4s ease;
+}
+
+.reset-button:hover{
+    background-color: black;
+    color: white;
+    border: 3px solid white;
 }
