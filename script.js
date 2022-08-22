@@ -1,5 +1,7 @@
 const cells = document.querySelectorAll("div.cell");
 const board = document.querySelector(".board");
+const winMessage = document.querySelector(".winning-message");
+const winner = document.querySelector(".winner");
 const winCases = [
     //horizontal strikes
     [0,1,2],
@@ -15,17 +17,38 @@ const winCases = [
     [0,4,8],
     [2,4,6]
 ];
+let current;
+let turnX;
 
-//setting default turn to X 
-//[switch turnX to false if you want O turn first]
-let turnX = true;
-board.classList.add( turnX ? 'x' : 'o');
+//adding event listener to reset button
+document.querySelector('.reset-button').addEventListener('click', startGame);
 
+//this is the game start/restart function
+function startGame() {
 
-//adding action listener to each cell
-cells.forEach((cell) => {
-    cell.addEventListener('click', handleClick, { once: true })
-});
+    //resetting class and eventlistener
+    cells.forEach((cell) => {
+        //removing o and x classes
+        cell.classList.remove('o');
+        cell.classList.remove('x');
+
+        //only once clickable eventlistener removed
+        cell.removeEventListener('click', handleClick);
+    });
+
+    //reset and remove end game message
+    winner.classList.remove("show");
+    winMessage.innerText = '';
+
+    //default first turn is set to x [switch turnX to false if you want O turn first]
+    turnX = true;
+    board.classList.add( turnX ? 'x' : 'o');
+
+    //adding action listener to each cell
+    cells.forEach((cell) => {
+        cell.addEventListener('click', handleClick, { once: true })
+    });
+}
 
 function handleClick(event){
 
@@ -33,19 +56,26 @@ function handleClick(event){
     const cell = event.target;
 
     //checking whose turn it is
-    const current = turnX ? "x" : "o";
+    current = turnX ? "x" : "o";
 
     //set the mark
     placeMark(cell, current);
 
-    //check for win (display win message if win)
-    checkForWin(current) ? console.log(`winner is ${current}`): console.log("next turn");
+    //check whether to  win/draw/continue
+    if (checkForWin(current)) {
+        //win
+        endGameFromDraw(false);
+    }
+    else if (checkForDraw()) {
+        //draw
+        endGameFromDraw(true);
 
-    //check for draw (display draw message if draw)
+    }
+    else {
+        //continue
+        swapTurn();
+    } 
 
-
-    //switch turn
-    swapTurn();
 }
 
 const placeMark = (cell, current) => {
@@ -66,8 +96,27 @@ const swapTurn = () => {
 
 const checkForWin = (current) => {
     return (winCases.some((winCase) => {
-        return(winCase.every((index) => {
-            return(cells[index].classList.contains(current));
+        return (winCase.every((index) => {
+            return (cells[index].classList.contains(current));
         }));
     }));
 }
+
+const checkForDraw = () => {
+    return ([...cells].every((cell) => {
+        return (cell.classList.contains('x') || cell.classList.contains('o'))
+    }));
+}
+
+const endGameFromDraw = (draw) => {
+    if (draw) {
+        winMessage.innerText = `It's a Draw!`;
+    }
+    else {
+        winMessage.innerText = `${current.toUpperCase()} has won!`;
+    }
+    winner.classList.add("show");
+}
+
+//calling start game
+startGame();
